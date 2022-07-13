@@ -25,15 +25,13 @@
 
     async function getTransaction() {
       tx_id = '0xc8b24d64289fd0ba76381f6c0a91371862f994aab180f30c5c2e915460a0d285'
-      web3.eth.getTransaction(tx_id, function(err, tx){
+      console.log("OverView");
+      await web3.eth.getTransaction(tx_id, function(err, tx){
           for (var x in tx)
             console.log(x, ":", tx[x]);
-          // let input_data = '0x' + tx_data.slice(10);  // get only data without function selector
-
-          // let params = web3.eth.abi.decodeParameters(['bytes32', 'string', 'string', 'string'], input_data);
-          // console.log(params);
       });
-      web3.currentProvider.send({ 
+      console.log("Internal Txns");
+      await web3.currentProvider.send({ 
         method: "Transfer", 
         params: [tx_id, ['trace']], 
         jsonrpc: "2.0", id: "1"}, 
@@ -41,6 +39,10 @@
           console.log(err, out);
         }
       );
+      console.log("Logs");
+      await web3.eth.getTransactionReceipt(tx_id, function(err, tx){
+          console.log(tx);
+      });
     }
 
     async function getBalance(address) {
