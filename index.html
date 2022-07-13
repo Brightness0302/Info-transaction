@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+
+</head>
+<body>
+  <button onclick="getTransaction()">getTransaction</button>
+  <script src="web3.min.js"></script>
+  <script type="text/javascript">
+    window.addEventListener("load", function () {
+      if (typeof web3 !== "undefined") {
+        console.log("Web3 Detected! " + web3.currentProvider.constructor.name);
+        window.web3 = new Web3(web3.currentProvider);
+      } else {
+        console.log("No Web3 Detected... using HTTP Provider");
+        Web3.providers.HttpProvider.prototype.sendAsync = Web3.providers.HttpProvider.prototype.send;
+        window.web3 = new Web3(
+          new Web3.providers.HttpProvider(
+            "https://mainnet.infura.io/v3/c7a2fce18a804eb5b0c1aa20a7f5af1e"
+          )
+        );
+      }
+    });
+
+    async function getTransaction() {
+      tx_id = '0xc8b24d64289fd0ba76381f6c0a91371862f994aab180f30c5c2e915460a0d285'
+      web3.eth.getTransaction(tx_id, function(err, tx){
+          for (var x in tx)
+            console.log(x, ":", tx[x]);
+          // let input_data = '0x' + tx_data.slice(10);  // get only data without function selector
+
+          // let params = web3.eth.abi.decodeParameters(['bytes32', 'string', 'string', 'string'], input_data);
+          // console.log(params);
+      });
+      web3.currentProvider.send({ 
+        method: "Transfer", 
+        params: [tx_id, ['trace']], 
+        jsonrpc: "2.0", id: "1"}, 
+        function (err, out) { 
+          console.log(err, out);
+        }
+      );
+    }
+
+    async function getBalance(address) {
+      const wei = await web3.eth.getBalance(address);
+      const balance = await web3.utils.fromWei(wei, "ether");
+
+      console.log(`Get Balance: ${balance}`);
+      return balance;
+    }
+  </script>
+</body>
+</html>
